@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Museum</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="museum.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+<header class="header">
+  <div class="header-left">
+    <h1>Museum collections</h1>
+    <span class="subtitle">View and explore your donated collections.</span>
+  </div>
+  <div class="header-right">
+    <img 
+      id="headerAvatar" 
+      src="https://vzge.me/head/250/Guest" 
+      alt="Header Minecraft Skin" 
+      class="image-pixelated"
+    >
+    <div id="headerUsername" title="Guest">Guest</div>
+  </div>
+</header>
+
+
+
+  <nav>
+    <ul id="navList">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="museum.html">Museum</a></li>
+      <li><a href="checkup.html">Checkup</a></li>
+      <li><a href="profile.html">Profile</a></li>
+    </ul>
+    <span id="navUnderline"></span>
+  </nav>
+
+  <div class="controls">
+    <input type="text" id="usernameInput" placeholder="Enter username">
+    <button id="btnLoadUser">Check</button>
+    <input type="search" id="search" placeholder="Search by ID...">
+    <button id="btnClearSearch">Clear Search</button>
+    <button id="clearLocalStorageBtn">Clear localStorage</button>
+  </div>
+
+  <div class="filters">
+    <button id="btn-total">Total (0)</button>
+    <button id="btn-donated">Donated (0)</button>
+    <button id="btn-missing">Missing (0)</button>
+    <select id="jobFilter"><option value="">All jobs</option></select>
+  </div>
+
+  <div class="grid" id="itemsGrid"></div>
+  <div class="empty" id="empty" style="display:none">No items found.</div>
+
+  <div class="pagination">
+    <button id="prevPage">Previous</button>
+    <span id="pageInfo">Page 1 / 1</span>
+    <button id="nextPage">Next</button>
+  </div>
+</div>
+
+<script src="museum.js"></script>
+</body>
+</html>
