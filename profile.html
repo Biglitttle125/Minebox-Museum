@@ -46,25 +46,43 @@
        crossorigin="anonymous">
 
   <!-- Right side: username input and stats -->
-<div style="display: flex; flex-direction: column; gap: 1rem; align-items: flex-start;">
+<div class="main-container">
   <!-- Username input -->
-  <input type="search" id="usernameInput" placeholder="Enter username" 
-         style="padding: 0.5rem; border-radius: 8px; border: 1px solid #ccc; width: 300px;">
+  <input type="search" id="usernameInput" placeholder="Enter username" class="username-input">
 
-  <!-- Player stats card -->
-  <div class="card" id="userStatsCard" style="width: 300px;">
-    <h3>Player Stats</h3>
-    <p><strong>Username:</strong> <span id="displayUsername">✒️</span></p>
-    <p><strong>Total Playtime:</strong> <span id="displayPlaytime">⌚</span></p>
-    <p><strong>Total Donated:</strong> <span id="displayDonated">🖼️</span></p>
+  <!-- Cards row -->
+  <div class="cards-row">
+    <!-- Player stats card -->
+    <div class="card" id="userStatsCard">
+      <h3>Player Stats</h3>
+      <div id="statsContent"></div> <!-- dynamic content -->
+    </div>
+
+    <!-- Active mount card -->
+    <div class="card" id="mountGrid">
+      <h3>Active Mount</h3>
+    </div>
   </div>
-<div id="skillsCard" class="card skills-card">
-  <h3>Skills & Level</h3>
-  <div id="skillsList" class="skills-list"></div>
+
+<!-- Skills & new card row -->
+<div class="cards-row">
+  <!-- Skills card -->
+  <div id="skillsCard" class="card skills-card">
+    <h3>Skills & Level</h3>
+    <div id="skillsList" class="skills-list"></div>
+  </div>
+
+  <!-- New card -->
+  <div id="randomStatsCard" class="card random-stats">
+    <h3>Random Stats</h3>
+    <div id="randomStats">
+      <!-- dynamic content -->
+      <p></p>
+    </div>
+  </div>
+</div>
 </div>
 
-
-</div>
 
 </div>
   

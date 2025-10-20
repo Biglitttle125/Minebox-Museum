@@ -1,12 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // --- State ---
   let allItems = [];
   let museumIds = [];
   let currentUsername = localStorage.getItem("checkupUsername") || "";
   let playerDataLoaded = false;
-  let currentFilter = 'total';
+  let currentFilter = "total";
   let currentPage = 1;
   const itemsPerPage = 16;
 
+  // --- Rarity Images ---
   const rarityImages = {
     UNCOMMON: "pictures/rarity/uncommon.png",
     COMMON: "pictures/rarity/common.png",
@@ -16,98 +18,101 @@ document.addEventListener("DOMContentLoaded", () => {
     MYTHIC: "pictures/rarity/mythic.png"
   };
 
-  // --- Elements ---
-  const resultsBody = document.getElementById("results");
-  const searchInput = document.getElementById("searchInput");
-  const usernameInput = document.getElementById("usernameInput");
-  const prevPageBtn = document.getElementById("prevPage");
-  const nextPageBtn = document.getElementById("nextPage");
-  const pageInfo = document.getElementById("pageInfo");
-  const btnTotal = document.getElementById("btn-total");
-  const btnDonated = document.getElementById("btn-donated");
-  const btnMissing = document.getElementById("btn-missing");
-  const jobFilter = document.getElementById("jobFilter");
-  const checkBtn = document.getElementById("checkBtn");
-  const clearSearchBtn = document.getElementById("clearSearchBtn");
-  const modalJob = document.getElementById("modalJob");
-  const modal = document.getElementById("itemModal");
-  const modalClose = document.getElementById("modalClose");
-  const modalTitle = document.getElementById("modalTitle");
-  const modalRarity = document.getElementById("modalRarity");
-  const modalIngredients = document.getElementById("modalIngredients");
-  const calculatorLink = document.getElementById("calculatorLink");
-  const headerAvatar = document.getElementById("headerAvatar");
-  const headerUsername = document.getElementById("headerUsername");
+  // --- DOM Helpers ---
+  const $ = id => document.getElementById(id);
+
+  const resultsBody = $("results");
+  const searchInput = $("searchInput");
+  const usernameInput = $("usernameInput");
+  const prevPageBtn = $("prevPage");
+  const nextPageBtn = $("nextPage");
+  const pageInfo = $("pageInfo");
+  const btnTotal = $("btn-total");
+  const btnDonated = $("btn-donated");
+  const btnMissing = $("btn-missing");
+  const jobFilter = $("jobFilter");
+  const checkBtn = $("checkBtn");
+  const clearSearchBtn = $("clearSearchBtn");
+  const modal = $("itemModal");
+  const modalClose = $("modalClose");
+  const modalTitle = $("modalTitle");
+  const modalRarity = $("modalRarity");
+  const modalIngredients = $("modalIngredients");
+  const modalJob = $("modalJob");
+  const calculatorLink = $("calculatorLink");
+  const headerAvatar = $("headerAvatar");
+  const headerUsername = $("headerUsername");
+  const clearLocalStorageBtn = $("clearLocalStorageBtn");
+
   let lastValidAvatar = headerAvatar?.src;
-  const clearLocalStorageBtn = document.getElementById("clearLocalStorageBtn");
 
-  // --- Helpers ---
-  const formatID = id => (id||"").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());
-  const normalize = str => (str||"").toLowerCase().replace(/[\s_]+/g,"");
-  const debounce = (fn, delay) => { let timer; return (...args)=>{ clearTimeout(timer); timer=setTimeout(()=>fn.apply(this,args), delay); }; };
-const calcIcon = document.getElementById("calculatorIcon"); calcIcon.addEventListener("mouseenter", () => calcIcon.src = "pictures/calculator-secondary.svg"); calcIcon.addEventListener("mouseleave", () => calcIcon.src = "pictures/calculator.svg");
-  // --- Show/Hide UI elements ---
-  function updateUIVisibility() {
-    if (!usernameInput || !checkBtn) return;
+  // --- Utility Functions ---
+  const formatID = id => (id || "").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+  const normalize = str => (str || "").toLowerCase().replace(/[\s_]+/g, "");
+  const debounce = (fn, delay) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn.apply(this, args), delay);
+    };
+  };
+  const isOwned = id => museumIds.some(mid => mid.toLowerCase() === (id || "").toLowerCase());
 
-    // Username input and check button always visible if username exists
-    usernameInput.classList.toggle("show", !!currentUsername);
-    checkBtn.classList.toggle("show", !!currentUsername);
+  // --- Image Helper ---
+  const getSafeImage = item => {
+    if (item.image?.trim()) return `data:image/png;base64,${item.image}`;
+    if (item.id?.toLowerCase().startsWith("mount_")) return `pictures/mounts/${item.id.substring(6)}.png`;
+    if (item.id?.toLowerCase().startsWith("spawner_")) return "pictures/undefined/spawner.png";
+    return "pictures/undefined.png";
+  };
 
-    // Elements that depend on player data loaded
-    const dataUI = [
-      searchInput, clearSearchBtn,
-      prevPageBtn, nextPageBtn, pageInfo,
-      btnTotal, btnDonated, btnMissing,
-      jobFilter,checkBtn,usernameInput
-    ];
-
-    dataUI.forEach(el => {
-      if (el) el.classList.toggle("show", !!currentUsername && playerDataLoaded);
-    });
-
-    // Clear localStorage button always visible
-    if (clearLocalStorageBtn) clearLocalStorageBtn.classList.add("show");
-  }
-
-  function updateHeaderAvatar(username) {
+  // --- Header Avatar ---
+  const updateHeaderAvatar = name => {
     if (!headerAvatar || !headerUsername) return;
-    const name = username || "Guest";
-    headerAvatar.src = `https://vzge.me/head/250/${encodeURIComponent(name)}`;
-    headerAvatar.alt = `${name}'s Head Skin`;
-    headerUsername.textContent = name;
-    headerUsername.title = name;
-  }
+    const displayName = name || "Guest";
+    headerAvatar.src = `https://vzge.me/head/250/${encodeURIComponent(displayName)}`;
+    headerAvatar.alt = `${displayName}'s Head Skin`;
+    headerUsername.textContent = displayName;
+    headerUsername.title = displayName;
+  };
 
   if (headerAvatar) {
     headerAvatar.onerror = () => { headerAvatar.src = lastValidAvatar; };
     headerAvatar.onload = () => { lastValidAvatar = headerAvatar.src; };
   }
 
-  function promptUsername(message="Please enter your username:") {
-    const username = window.prompt(message);
-    if (username?.trim()) {
-      currentUsername = username.trim();
+  // --- UI Visibility ---
+  const updateUIVisibility = () => {
+    const visible = !!currentUsername && playerDataLoaded;
+    [searchInput, clearSearchBtn, prevPageBtn, nextPageBtn, pageInfo, btnTotal, btnDonated, btnMissing, jobFilter, checkBtn, usernameInput].forEach(el => {
+      if (el) el.classList.toggle("show", visible);
+    });
+    if (clearLocalStorageBtn) clearLocalStorageBtn.classList.add("show");
+  };
+
+  // --- Prompt Username ---
+  const promptUsername = (message = "Please enter your username:") => {
+    const username = window.prompt(message)?.trim();
+    if (username) {
+      currentUsername = username;
       localStorage.setItem("checkupUsername", currentUsername);
       usernameInput.value = currentUsername;
       updateHeaderAvatar(currentUsername);
       updateUIVisibility();
       loadPlayerData(currentUsername);
     }
-  }
+  };
 
-  // --- Load items ---
-  async function loadItems() {
+  // --- Load Items ---
+  const loadItems = async () => {
     try {
       const res = await fetch("https://cdn2.minebox.co/data/items.json");
       const data = await res.json();
-      allItems = Array.isArray(data) ? data : (data.items||[]);
-      allItems = allItems.map(item => { if(!item.id) item.id=""; return item; });
+      allItems = Array.isArray(data) ? data : data.items || [];
+      allItems.forEach(item => { if (!item.id) item.id = ""; });
 
-      if(!currentUsername) {
-        resultsBody.innerHTML=`<tr><td colspan="4" style="text-align:center; cursor:pointer; font-weight:bold; color:#FFFFFF;">Click here to enter your username.</td></tr>`;
-        resultsBody.querySelector("td").addEventListener("click", ()=>promptUsername());
-        updateUIVisibility();
+      if (!currentUsername) {
+        showEnterUsernameMessage("Click here to enter your username.");
         return;
       }
 
@@ -115,161 +120,168 @@ const calcIcon = document.getElementById("calculatorIcon"); calcIcon.addEventLis
       await loadPlayerData(currentUsername);
       populateJobFilter();
       updateUIVisibility();
-    } catch(err) {
+    } catch (err) {
       console.error(err);
-      resultsBody.innerHTML="<tr><td colspan='4'>Failed to load items.</td></tr>";
+      resultsBody.innerHTML = "<tr><td colspan='4'>Failed to load items.</td></tr>";
     }
-  }
+  };
 
-  // --- Load player data ---
-  async function loadPlayerData(username){
+  // --- Show Enter Username Box ---
+  const showEnterUsernameMessage = (text) => {
+    resultsBody.innerHTML = `<tr><td colspan="4" style="text-align:center; cursor:pointer; font-weight:bold; color:#FFFFFF;" title="Click to enter your username">${text}</td></tr>`;
+    resultsBody.querySelector("td").addEventListener("click", () => promptUsername("Please enter your username:"));
+  };
+
+  // --- Load Player Data ---
+  const loadPlayerData = async username => {
     try {
       const res = await fetch(`https://api.minebox.co/data/${username}`);
       const data = await res.json();
-      museumIds = (data.data.OBJECTIVES.museum||[]).map(id => id.toString());
+      museumIds = (data.data.OBJECTIVES.museum || []).map(String);
       playerDataLoaded = true;
       updateCounts();
       currentPage = 1;
       renderItems(currentFilter, searchInput.value);
       updateHeaderAvatar(username);
       updateUIVisibility();
-    } catch(err){
+    } catch (err) {
       console.error(err);
       museumIds = [];
       playerDataLoaded = false;
-      resultsBody.innerHTML=`<tr><td colspan='4' style="text-align:center; cursor:pointer; font-weight:bold; color:#FFFFFF;">Failed to load player data. Click here to enter your username.</td></tr>`;
-      resultsBody.querySelector("td").addEventListener("click", ()=>promptUsername());
-      if(headerAvatar) headerAvatar.src = lastValidAvatar;
+      showEnterUsernameMessage("Failed to load player data. Click here to enter your username.");
+      if (headerAvatar) headerAvatar.src = lastValidAvatar;
       updateUIVisibility();
     }
-  }
+  };
 
-  function updateCounts() {
-    const excludeRegex=/^(?:xmas_|lny_|emote_|ship_default|Mount_Default|Valentine_Letter|Pet_Egg|nameplate_)/i;
-    const total = allItems.filter(item=>!excludeRegex.test(item.id||"")).length;
+  // --- Update Counts ---
+  const updateCounts = () => {
+    const excludeRegex = /^(?:xmas_|lny_|emote_|ship_default|Mount_Default|Valentine_Letter|Pet_Egg|nameplate_)/i;
+    const total = allItems.filter(item => !excludeRegex.test(item.id || "")).length;
     const donated = museumIds.length;
     const missing = total - donated;
     btnTotal.innerText = `Total (${total})`;
     btnDonated.innerText = `Donated (${donated})`;
     btnMissing.innerText = `Missing (${missing})`;
-  }
+  };
 
-  function populateJobFilter() {
-    const jobSet = new Set();
-    allItems.forEach(item => { if(item.recipe?.job) jobSet.add(item.recipe.job); });
-    while(jobFilter.options.length>1) jobFilter.remove(1);
-    Array.from(jobSet).sort().forEach(job => {
-      const option = document.createElement("option");
-      option.value = job;
-      option.textContent = formatID(job);
-      jobFilter.appendChild(option);
+  // --- Populate Job Filter ---
+  const populateJobFilter = () => {
+    const jobs = Array.from(new Set(allItems.filter(i => i.recipe?.job).map(i => i.recipe.job))).sort();
+    while (jobFilter.options.length > 1) jobFilter.remove(1);
+    jobs.forEach(job => {
+      const opt = document.createElement("option");
+      opt.value = job;
+      opt.textContent = formatID(job);
+      jobFilter.appendChild(opt);
     });
-  }
+  };
 
-  // --- Render items ---
-  function renderItems(filter, query="") {
+  // --- Render Items ---
+  const renderItems = (filter, query = "") => {
     resultsBody.classList.add("fade-out");
     const normalizedQuery = normalize(query);
     const selectedJob = jobFilter.value;
 
-    setTimeout(()=>{
-      resultsBody.innerHTML="";
-      const excludeRegex=/^(?:xmas_|lny_|emote_|nameplate_)/i;
+    setTimeout(() => {
+      resultsBody.innerHTML = "";
+      const excludeRegex = /^(?:xmas_|lny_|emote_|nameplate_)/i;
 
       const filtered = allItems.filter(item => {
-        const owned = museumIds.some(id=>id.toLowerCase() === (item.id||"").toLowerCase());
-        if(filter==="donated" && !owned) return false;
-        if(filter==="missing" && (owned || excludeRegex.test(item.id||""))) return false;
-        if(filter==="total" && excludeRegex.test(item.id||"")) return false;
-        if(normalizedQuery && !normalize(item.id).includes(normalizedQuery)) return false;
-        const itemJob = item.recipe?.job || "__NO_JOB__";
-        if(selectedJob && itemJob !== selectedJob) return false;
+        const owned = isOwned(item.id);
+        if (filter === "donated" && !owned) return false;
+        if (filter === "missing" && (owned || excludeRegex.test(item.id || ""))) return false;
+        if (filter === "total" && excludeRegex.test(item.id || "")) return false;
+        if (normalizedQuery && !normalize(item.id).includes(normalizedQuery)) return false;
+        if (selectedJob && (item.recipe?.job || "__NO_JOB__") !== selectedJob) return false;
         return true;
-      }).sort((a,b)=>(a.level||0)-(b.level||0));
+      }).sort((a, b) => (a.level || 0) - (b.level || 0));
 
-      const totalPages = Math.ceil(filtered.length/itemsPerPage)||1;
-      if(currentPage>totalPages) currentPage=totalPages;
-      const pageItems = filtered.slice((currentPage-1)*itemsPerPage, currentPage*itemsPerPage);
+      const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+      if (currentPage > totalPages) currentPage = totalPages;
+      const pageItems = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-      pageItems.forEach(item=>{
-        const owned = museumIds.some(id=>id.toLowerCase() === (item.id||"").toLowerCase());
-        const row = document.createElement("tr");
-        const displayID = formatID(item.id);
-        const iconSrc = item.image?.trim()? `data:image/png;base64,${item.image}`:"pictures/undefined.png";
-        const rarityImg = item.rarity && rarityImages[item.rarity]? `<img class="rarity-icon" src="${rarityImages[item.rarity]}" title="${item.rarity}" alt="${item.rarity}">` : "-";
+      if (!pageItems.length) {
+        resultsBody.innerHTML = "<tr><td colspan='4'>No items found.</td></tr>";
+      } else {
+        pageItems.forEach(item => {
+          const owned = isOwned(item.id);
+          const row = document.createElement("tr");
+          const displayID = formatID(item.id);
+          const iconSrc = getSafeImage(item);
+          const rarityImg = item.rarity && rarityImages[item.rarity] ? `<img class="rarity-icon" src="${rarityImages[item.rarity]}" title="${item.rarity}" alt="${item.rarity}">` : "-";
 
-        row.innerHTML = `
-          <td class="id-cell"><img class="item-icon" src="${iconSrc}" alt="${displayID}" loading="lazy"><span>${displayID}</span></td>
-          <td>${rarityImg}</td>
-          <td>${item.level||"-"}</td>
-          <td>${item.category||"-"}</td>
-        `;
+          row.innerHTML = `
+            <td class="id-cell"><img class="item-icon" src="${iconSrc}" alt="${displayID}" loading="lazy"><span>${displayID}</span></td>
+            <td>${rarityImg}</td>
+            <td>${item.level || "-"}</td>
+            <td>${item.category || "-"}</td>
+          `;
 
-        if(filter!=="donated" && !owned){
-          row.style.backgroundColor="#ffcccc";
-          row.style.color="#555";
-          row.querySelector(".id-cell span").style.color="#555";
-        }
+          if (filter !== "donated" && !owned) {
+            row.style.backgroundColor = "#ffcccc";
+            row.style.color = "#555";
+            row.querySelector(".id-cell span").style.color = "#555";
+          }
 
-        row.addEventListener("click",()=>openModal(item));
-        resultsBody.appendChild(row);
-      });
+          row.addEventListener("click", () => openModal(item));
+          resultsBody.appendChild(row);
+        });
+      }
 
-      if(pageItems.length===0) resultsBody.innerHTML="<tr><td colspan='4'>No items found.</td></tr>";
-
-      prevPageBtn.disabled = currentPage===1;
-      nextPageBtn.disabled = currentPage===totalPages;
+      prevPageBtn.disabled = currentPage === 1;
+      nextPageBtn.disabled = currentPage === totalPages;
       pageInfo.innerText = `Page ${currentPage} / ${totalPages}`;
       resultsBody.classList.remove("fade-out");
-    },200);
-  }
+    }, 200);
+  };
 
   // --- Modal ---
-  function openModal(item){
-    const iconSrc = item.image?.trim() ? `data:image/png;base64,${item.image}` : "pictures/undefined.png";
-    const modalHeaderImage = document.getElementById("modalHeaderImage");
-    modalHeaderImage.src = iconSrc;
-    modalHeaderImage.alt = formatID(item.id);
+  const openModal = item => {
+    const iconSrc = getSafeImage(item);
+    $("modalHeaderImage").src = iconSrc;
+    $("modalHeaderImage").alt = formatID(item.id);
     modalTitle.textContent = formatID(item.id);
     modalTitle.title = formatID(item.id);
 
-    const rawJob = item.recipe?.job;
-    if (rawJob) {
-      const jobName = rawJob.charAt(0).toUpperCase() + rawJob.slice(1).toLowerCase();
-      const jobImgSrc = `pictures/skills/${rawJob.toLowerCase()}.png`;
-      modalJob.innerHTML = `<img src="${jobImgSrc}" alt="${jobName}" title="${jobName}" style="width:24px;height:24px;margin-right:4px;vertical-align:middle;"><span>${jobName}</span>`;
-    } else modalJob.innerHTML = `<span>-</span>`;
+    const job = item.recipe?.job;
+    modalJob.innerHTML = job
+      ? `<img src="pictures/skills/${job.toLowerCase()}.png" alt="${formatID(job)}" title="${formatID(job)}" style="width:24px;height:24px;margin-right:4px;vertical-align:middle;"><span>${formatID(job)}</span>`
+      : "<span>-</span>";
 
     modalRarity.src = rarityImages[item.rarity] || "";
 
     modalIngredients.innerHTML = "";
-    if(item.recipe?.ingredients?.length){
-      item.recipe.ingredients.forEach(ing=>{
-        const ingItem = allItems.find(i=>i.id===ing.id);
-        const div = document.createElement("div");
-        const ingImg = ingItem?.image ? `data:image/png;base64,${ingItem.image}` : "pictures/undefined.png";
-        div.style.display="flex"; div.style.alignItems="center"; div.style.gap="0.3rem";
-        div.innerHTML = `<img src="${ingImg}" alt="${ing.id}" title="${formatID(ing.id)}" style="width:32px;height:32px;object-fit:contain;cursor:pointer;"><span>${formatID(ing.id)}:</span>${ing.amount}`;
-        div.querySelector("img").addEventListener("click", e=>{ e.stopPropagation(); openModal(ingItem); });
-        modalIngredients.appendChild(div);
+    item.recipe?.ingredients?.forEach(ing => {
+      const ingItem = allItems.find(i => i.id === ing.id);
+      const div = document.createElement("div");
+      const ingImg = ingItem ? getSafeImage(ingItem) : "pictures/undefined.png";
+      div.style.display = "flex";
+      div.style.alignItems = "center";
+      div.style.gap = "0.3rem";
+      div.innerHTML = `<img src="${ingImg}" alt="${ing.id}" title="${formatID(ing.id)}" style="width:32px;height:32px;object-fit:contain;cursor:pointer;"><span>${formatID(ing.id)}:</span>${ing.amount}`;
+      div.querySelector("img").addEventListener("click", e => {
+        e.stopPropagation();
+        if (ingItem) openModal(ingItem);
       });
-    }
+      modalIngredients.appendChild(div);
+    });
 
     calculatorLink.href = `https://minebox.co/universe/calculator?id=${encodeURIComponent(item.id)}`;
     calculatorLink.title = `Open ${formatID(item.id)} in the Official Minebox calculator`;
 
     modal.classList.add("active");
-  }
+  };
 
-  modalClose.addEventListener("click", ()=>modal.classList.remove("active"));
-  modal.addEventListener("click", e => { if(e.target===modal) modal.classList.remove("active"); });
+  modalClose.addEventListener("click", () => modal.classList.remove("active"));
+  modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("active"); });
 
   // --- Pagination & Filters ---
-  function changePage(delta){ currentPage+=delta; renderItems(currentFilter, searchInput.value); window.scrollTo({top:0,behavior:"smooth"}); }
-  function filterItems(type){ currentFilter=type; currentPage=1; renderItems(currentFilter, searchInput.value); }
-  function loadItemsForUser(){
+  const changePage = delta => { currentPage += delta; renderItems(currentFilter, searchInput.value); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const filterItems = type => { currentFilter = type; currentPage = 1; renderItems(currentFilter, searchInput.value); };
+  const loadItemsForUser = () => {
     const val = usernameInput.value.trim();
-    if(val){
+    if (val) {
       currentUsername = val;
       localStorage.setItem("checkupUsername", currentUsername);
       currentPage = 1;
@@ -277,41 +289,42 @@ const calcIcon = document.getElementById("calculatorIcon"); calcIcon.addEventLis
       updateUIVisibility();
       loadPlayerData(currentUsername);
     }
-  }
-  function clearSearch(){ searchInput.value=""; currentPage=1; renderItems(currentFilter); }
+  };
+  const clearSearch = () => { searchInput.value = ""; currentPage = 1; renderItems(currentFilter); };
 
   // --- Event Listeners ---
   checkBtn.addEventListener("click", loadItemsForUser);
-  usernameInput.addEventListener("keydown", e => { if(e.key==="Enter") loadItemsForUser(); });
-  usernameInput.addEventListener("input", debounce(()=>updateHeaderAvatar(usernameInput.value.trim()),200));
+  usernameInput.addEventListener("keydown", e => { if (e.key === "Enter") loadItemsForUser(); });
+  usernameInput.addEventListener("input", debounce(() => updateHeaderAvatar(usernameInput.value.trim()), 200));
   clearSearchBtn.addEventListener("click", clearSearch);
-  prevPageBtn.addEventListener("click", ()=>changePage(-1));
-  nextPageBtn.addEventListener("click", ()=>changePage(1));
-  btnTotal.addEventListener("click", ()=>filterItems("total"));
-  btnDonated.addEventListener("click", ()=>filterItems("donated"));
-  btnMissing.addEventListener("click", ()=>filterItems("missing"));
-  jobFilter.addEventListener("change", ()=>{ currentPage=1; renderItems(currentFilter, searchInput.value); });
-  searchInput.addEventListener("input", debounce(()=>renderItems(currentFilter, searchInput.value),200));
+  prevPageBtn.addEventListener("click", () => changePage(-1));
+  nextPageBtn.addEventListener("click", () => changePage(1));
+  btnTotal.addEventListener("click", () => filterItems("total"));
+  btnDonated.addEventListener("click", () => filterItems("donated"));
+  btnMissing.addEventListener("click", () => filterItems("missing"));
+  jobFilter.addEventListener("change", () => { currentPage = 1; renderItems(currentFilter, searchInput.value); });
+  searchInput.addEventListener("input", debounce(() => renderItems(currentFilter, searchInput.value), 200));
 
-  if(clearLocalStorageBtn){
-    clearLocalStorageBtn.addEventListener("click", ()=>{
+  if (clearLocalStorageBtn) {
+    clearLocalStorageBtn.addEventListener("click", () => {
       localStorage.removeItem("checkupUsername");
       currentUsername = "";
       usernameInput.value = "";
       updateHeaderAvatar("");
       updateUIVisibility();
-      resultsBody.innerHTML = `<tr><td colspan="4" style="text-align:center; font-weight:bold; color:#FFFFFF; cursor:pointer;">Click here to enter your username.</td></tr>`;
-      resultsBody.querySelector("td").addEventListener("click", ()=>promptUsername());
+      showEnterUsernameMessage("Click here to enter your username.");
       museumIds = [];
       currentPage = 1;
     });
   }
 
-  // --- Initial load ---
+  // --- Initial Load ---
   updateUIVisibility();
-  if(currentUsername){
-    usernameInput.value=currentUsername;
+  if (currentUsername) {
+    usernameInput.value = currentUsername;
     updateHeaderAvatar(currentUsername);
+  } else {
+    showEnterUsernameMessage("Click here to enter your username.");
   }
   loadItems();
 });

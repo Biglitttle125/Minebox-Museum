@@ -5,9 +5,10 @@
   --bg-color: #ffffff;
   --row-hover: #e0e7ff;
   --even-row: #f3f4f6;
-  --cards:#111827;
+  --cards: #111827;
 }
 
+/* --- Body & Containers --- */
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
@@ -15,12 +16,15 @@ body {
   color: var(--text-color);
 }
 
-.container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
 
-
-
+/* --- Navigation --- */
 nav {
-  position: relative; /* needed for underline positioning */
+  position: relative;
 }
 
 nav ul {
@@ -30,9 +34,8 @@ nav ul {
   list-style: none;
   padding: 0;
   margin-bottom: 2rem;
-  position: relative; /* <-- important */
+  position: relative;
 }
-
 
 nav a {
   text-decoration: none;
@@ -43,13 +46,13 @@ nav a {
   transition: color 0.3s, transform 0.3s;
 }
 
-nav a:hover, nav a:focus { 
+nav a:hover,
+nav a:focus {
   color: var(--secondary-color);
   transform: scale(1.05);
   outline: none;
 }
 
-/* Sliding underline */
 #navUnderline {
   position: absolute;
   bottom: 0;
@@ -62,12 +65,14 @@ nav a:hover, nav a:focus {
   pointer-events: none;
 }
 
-
+/* --- Dark Mode --- */
 @media (prefers-color-scheme: dark) {
   body { background-color: #1f2937; color: #f3f4f6; }
   nav a { color: #6366f1; }
-  header {color: #ffffff;}
+  header { color: #ffffff; }
 }
+
+/* --- Inputs & Buttons --- */
 input, select, button {
   padding: 0.5rem 0.8rem;
   border-radius: 8px;
@@ -75,91 +80,162 @@ input, select, button {
   font-family: 'Inter', sans-serif;
   transition: all 0.3s;
 }
+
 button {
   background-color: var(--primary-color);
   color: white;
   cursor: pointer;
 }
+
 button:hover, button:focus {
   background-color: var(--secondary-color);
   transform: translateY(-1px);
   outline: none;
 }
-#userStatsCard p {
-  color: var(--primary-color);
-  font-size: 1rem;
-}
-#userStatsCard span {
-  color: var(--text-color);
-  font-weight: 600;
 
+/* --- User Stats Card --- */
+#userStatsCard {
+  width: 320px;
+  background: var(--cards);
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+  color: #fff;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
 }
+
 #userStatsCard h3 {
-    margin-bottom: 0.75rem;
-    font-size: 1.2rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 0.5rem;
 }
 
+#userStatsCard p {
+  margin: 6px 0;
+  
+}
+
+#userStatsCard span { color: var(--text-color); }
+.mountGrid-text { color: var(--primary-color); font-weight: bold; }
+
+/* --- Skills Card --- */
 .skills-card {
-    width: 300px;
-    margin-top: 1rem;
-    background: var(--cards);
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    color: #fff;
+  width: 320px;
+  margin-top: 1rem;
+  background: var(--cards);
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+  color: #fff;
+  padding: 20px;
 }
 
 .skills-card h3 {
-    margin-bottom: 0.75rem;
-    font-size: 1.2rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 0.5rem;
 }
 
-/* Make overall level + skill names primary-colored */
 .skills-list p strong {
-    color: var(--primary-color);
+  color: var(--primary-color);
 }
 
-/* Pulse effect for level 100 */
-.pulse {
-    animation: pulse 1.5s infinite;
-    font-weight: bold;
+.skill-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 4px 0;
 }
+
+.skill-line img {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* --- Mount Card --- */
+#mountGrid {
+  width: 320px;
+  background: var(--cards);
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+  color: #fff;
+  padding: 20px;
+}
+
+#mountGrid h3 {
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 0.5rem;
+}
+
+/* Rarity Icon */
+#mountGrid h3 .rarity-icon {
+  width: 96px;      
+  height: 20px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+/* --- Floating Crown --- */
+.floating-crown {
+  animation: floatCrown 2s infinite ease-in-out;
+  transform-origin: center bottom;
+  z-index: 5;
+}
+
+@keyframes floatCrown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* --- Pulse effects --- */
+.pulse {
+  animation: pulse 1.5s infinite;
+  font-weight: bold;
+}
+
 .pulse-img {
-    animation: pulse 1.5s infinite;
-    width: 24px;
-    height: 24px;
-    margin-left: 0.3rem;
+  animation: pulse 1.5s infinite;
+  width: 24px;
+  height: 24px;
+  margin-left: 0.3rem;
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); opacity: 0.4; }
-    100% { transform: scale(1); opacity: 1; }
-}
-.pulse-container {
-    display: inline-flex;
-    align-items: center;
-    animation: pulse 1.5s infinite;
-    gap: 0.3rem; /* spacing between number and image */
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
+/* --- Loading Icon --- */
+@keyframes pulseClock {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
 
+.loading-icon {
+  display: inline-block;
+  animation: pulseClock 1s ease-in-out infinite;
+  font-weight: bold;
+  color: var(--secondary-color);
+  font-size: 1.1rem;
+}
+
+/* --- Level Icon --- */
 .level-icon {
-    font-size: 1.2em;
-    margin-left: 0.3rem;
-    animation: none;
+  font-size: 1.2em;
+  margin-left: 0.3rem;
+  animation: none;
 }
 
-
-
+/* --- Header --- */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 .header {
   display: flex;
-  justify-content: space-between; /* pushes left and right apart */
+  justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
   border-bottom: 4px solid #333;
@@ -188,11 +264,11 @@ button:hover, button:focus {
 
 .header-right {
   display: flex;
-  flex-direction: column;   /* avatar above, username below */
+  flex-direction: column;
   align-items: center;
   text-align: center;
-  width: 100px;             /* fixed width to lock avatar in place */
-  flex-shrink: 0;           /* prevent shrinking */
+  width: 100px;
+  flex-shrink: 0;
 }
 
 .header-right img.image-pixelated {
@@ -218,12 +294,84 @@ button:hover, button:focus {
   text-align: center;
   text-shadow: 1px 1px #0008;
   letter-spacing: 1px;
-
-  /* handle long names */
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-width: 100px; /* keep it tidy under the avatar */
-  cursor: default; /* tooltip hint */
-
+  max-width: 100px;
+  cursor: default;
 }
+/* --- Main container --- */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+/* --- Username input --- */
+.username-input {
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 320px;
+  font-family: 'Inter', sans-serif;
+}
+/* --- Cards row --- */
+.cards-row {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch; /* ✅ makes both cards same height */
+  flex-wrap: wrap; /* responsive on small screens */
+}
+/* --- Cards flex behavior --- */
+.cards-row .card {
+  flex: 1 1 320px; /* grow/shrink with a base width of 320px */
+}
+
+/* Optional: ensure mount content is vertically aligned */
+#mountGrid .mount-container {
+  display: flex;
+  align-items: flex-start; /* image and stats aligned at top */
+  gap: 1rem;
+}
+/* Online pulse effect */
+.status-online {
+  display: inline-block;
+  margin-left: 6px;
+  animation: pulseOnline 1.5s infinite;
+}
+
+@keyframes pulseOnline {
+  0%   { transform: scale(1); opacity: 1; }
+  50%  { transform: scale(1.2); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Offline fade effect */
+.status-offline {
+  display: inline-block;
+  margin-left: 6px;
+  animation: fadeOffline 2s infinite;
+}
+
+@keyframes fadeOffline {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+/* --- New Card --- */
+.random-stats {
+  width: 320px;
+  margin-top: 1rem;
+  background: var(--cards);
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+  color: #fff;
+  padding: 20px;
+}
+
+.random-stats h3 {
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 0.5rem;
+}
+
