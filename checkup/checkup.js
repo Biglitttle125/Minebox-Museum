@@ -10,12 +10,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Rarity Images ---
   const rarityImages = {
-    UNCOMMON: "pictures/rarity/uncommon.png",
-    COMMON: "pictures/rarity/common.png",
-    RARE: "pictures/rarity/rare.png",
-    EPIC: "pictures/rarity/epic.png",
-    LEGENDARY: "pictures/rarity/legendary.png",
-    MYTHIC: "pictures/rarity/mythic.png"
+    UNCOMMON: "../pictures/rarity/uncommon.png",
+    COMMON: "../pictures/rarity/common.png",
+    RARE: "../pictures/rarity/rare.png",
+    EPIC: "../pictures/rarity/epic.png",
+    LEGENDARY: "../pictures/rarity/legendary.png",
+    MYTHIC: "../pictures/rarity/mythic.png"
   };
 
   // --- DOM Helpers ---
@@ -61,9 +61,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Image Helper ---
   const getSafeImage = item => {
     if (item.image?.trim()) return `data:image/png;base64,${item.image}`;
-    if (item.id?.toLowerCase().startsWith("mount_")) return `pictures/mounts/${item.id.substring(6)}.png`;
-    if (item.id?.toLowerCase().startsWith("spawner_")) return "pictures/undefined/spawner.png";
-    return "pictures/undefined.png";
+    if (item.id?.toLowerCase().startsWith("mount_")) return `../pictures/mounts/${item.id.substring(6)}.png`;
+    if (item.id?.toLowerCase().startsWith("spawner_")) return "../pictures/undefined/spawner.png";
+    return "../pictures/undefined.png";
   };
 
   // --- Header Avatar ---
@@ -246,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const job = item.recipe?.job;
     modalJob.innerHTML = job
-      ? `<img src="pictures/skills/${job.toLowerCase()}.png" alt="${formatID(job)}" title="${formatID(job)}" style="width:24px;height:24px;margin-right:4px;vertical-align:middle;"><span>${formatID(job)}</span>`
+      ? `<img src="../pictures/skills/${job.toLowerCase()}.png" alt="${formatID(job)}" title="${formatID(job)}" style="width:24px;height:24px;margin-right:4px;vertical-align:middle;"><span>${formatID(job)}</span>`
       : "<span>-</span>";
 
     modalRarity.src = rarityImages[item.rarity] || "";
@@ -255,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
     item.recipe?.ingredients?.forEach(ing => {
       const ingItem = allItems.find(i => i.id === ing.id);
       const div = document.createElement("div");
-      const ingImg = ingItem ? getSafeImage(ingItem) : "pictures/undefined.png";
+      const ingImg = ingItem ? getSafeImage(ingItem) : "../pictures/undefined.png";
       div.style.display = "flex";
       div.style.alignItems = "center";
       div.style.gap = "0.3rem";
@@ -328,3 +328,4 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   loadItems();
 });
+
