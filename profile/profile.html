@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="profile.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="container">
+<header class="header">
+  <div class="header-left">
+    <h1>Minebox profile</h1>
+    <span class="subtitle">View your player profile and player stats.</span>
+  </div>
+  <div class="header-right">
+    <img id="headerAvatar" src="https://vzge.me/head/51/Jeppe0701" alt="Header Minecraft Skin" class="image-pixelated">
+    <div id="headerUsername">Jeppe0701</div>
+  </div>
+</header>
+
+
+
+<nav>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="museum.html">Museum</a></li>
+    <li><a href="checkup.html">Checkup</a></li>
+    <li><a href="profile.html">Profile</a></li>
+    <span id="navUnderline"></span>
+  </ul>
+</nav>
+
+
+<div style="display: flex; gap: 1rem; align-items: flex-start;">
+  <!-- Avatar image -->
+  <img id="avatar" 
+       src="https://vzge.me/full/500/Jeppe0701" 
+       alt="Minecraft Skin" 
+       class="w-40 h-auto image-pixelated" 
+       crossorigin="anonymous">
+
+  <!-- Right side: username input and stats -->
+<div class="main-container">
+  <!-- Username input -->
+  <input type="search" id="usernameInput" placeholder="Enter username" class="username-input">
+
+  <!-- Cards row -->
+  <div class="cards-row">
+    <!-- Player stats card -->
+    <div class="card" id="userStatsCard">
+      <h3>Player Stats</h3>
+      <div id="statsContent"></div> <!-- dynamic content -->
+    </div>
+
+    <!-- Active mount card -->
+    <div class="card" id="mountGrid">
+      <h3>Active Mount</h3>
+    </div>
+  </div>
+
+<!-- Skills & new card row -->
+<div class="cards-row">
+  <!-- Skills card -->
+  <div id="skillsCard" class="card skills-card">
+    <h3>Skills & Level</h3>
+    <div id="skillsList" class="skills-list"></div>
+  </div>
+
+  <!-- New card -->
+  <div id="randomStatsCard" class="card random-stats">
+    <h3>Random Stats</h3>
+    <div id="randomStats">
+      <!-- dynamic content -->
+      <p></p>
+    </div>
+  </div>
+</div>
+</div>
+
+
+</div>
+  
+</div>
+<script src="profile.js"></script>
+</body>
+</html>
+
