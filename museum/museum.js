@@ -40,12 +40,12 @@ const getSafeImage = item => {
     return `data:image/png;base64,${item.image}`;
   } 
   if (item.id?.toLowerCase().startsWith("mount_")) {
-    return `pictures/mounts/${item.id.substring(6)}.png`;
+    return `../pictures/mounts/${item.id.substring(6)}.png`;
   }
   if (item.id?.toLowerCase().startsWith("spawner_")) {
-    return "pictures/undefined/spawner.png";
+    return "../pictures/undefined/spawner.png";
   }
-  return "pictures/undefined.png";
+  return "../pictures/undefined.png";
 };
 
   const formatID = id => (id ?? "(no id)").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
@@ -160,14 +160,14 @@ const getSafeImage = item => {
         if (inMuseum) card.innerHTML = `<div class="badge">Donated</div>`;
 
         const jobDisplay = job ? job.charAt(0).toUpperCase() + job.slice(1).toLowerCase() : "No job";
-        const jobImg = job ? `<img src="pictures/skills/${job.toLowerCase()}.png" alt="${job}" style="width:18px;height:18px;vertical-align:middle;margin-right:4px;">` : "";
+        const jobImg = job ? `<img src="../pictures/skills/${job.toLowerCase()}.png" alt="${job}" style="width:18px;height:18px;vertical-align:middle;margin-right:4px;">` : "";
 
         card.innerHTML += `
           <img class="item" src="${getSafeImage(item)}" alt="${id}" loading="lazy">
           <div class="id">${formatID(id)}</div>
           <div class="job">${jobImg}${jobDisplay}</div>
           <div class="rarity">
-            ${item.rarity ? `<img src="pictures/rarity/${item.rarity.toLowerCase()}.png" alt="${item.rarity}">` : '<span class="placeholder">No rarity</span>'}
+            ${item.rarity ? `<img src="../pictures/rarity/${item.rarity.toLowerCase()}.png" alt="${item.rarity}">` : '<span class="placeholder">No rarity</span>'}
           </div>
         `;
         grid.appendChild(card);
@@ -312,3 +312,4 @@ const getSafeImage = item => {
 
   loadItems();
 });
+
