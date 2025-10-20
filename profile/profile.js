@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Special Logo ---
     const logoImg = createImg({
-        src: "pictures/mineboxdev.png",
+        src: "../pictures/mineboxdev.png",
         alt: "Special Logo",
         style: { width: "32px", height: "32px", position: "absolute", top: "8px", right: "8px", display: "none", borderRadius: "50%" }
     });
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Crown Overlay (unchanged) ---
     const crownImg = createImg({
-        src: "pictures/crown.png",
+        src: "../pictures/crown.png",
         alt: "Crown",
         style: { position: "absolute", display: "none" }
     });
@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const header = mountGrid.querySelector("h3");
-        const rarityImg = createImg({ src: `pictures/rarity/${mountData.rarity.toLowerCase()}.png`, alt: mountData.rarity, className: "rarity-icon" });
+        const rarityImg = createImg({ src: `../pictures/rarity/${mountData.rarity.toLowerCase()}.png`, alt: mountData.rarity, className: "rarity-icon" });
         header.querySelector(".rarity-icon")?.remove();
         header.appendChild(rarityImg);
 
@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
         mountContainer.style.alignItems = "flex-start";
         mountContainer.style.gap = "1rem";
 
-        mountContainer.appendChild(createImg({ src: `pictures/mounts/${activeMountId}.png`, alt: mountName.textContent, width: 64, height: 64 }));
+        mountContainer.appendChild(createImg({ src: `../pictures/mounts/${activeMountId}.png`, alt: mountName.textContent, width: 64, height: 64 }));
 
         const statsDiv = document.createElement("div");
         statsDiv.style.display = "flex";
@@ -257,9 +257,9 @@ document.addEventListener("DOMContentLoaded", () => {
             else {
                 const overallLine = document.createElement("p");
                 overallLine.classList.add("skill-line");
-                overallLine.appendChild(createImg({ src: "pictures/skills/crown.png", alt: "Crown", width: 20, height: 20 }));
+                overallLine.appendChild(createImg({ src: "../pictures/skills/crown.png", alt: "Crown", width: 20, height: 20 }));
                 overallLine.innerHTML += `<strong class="mountGrid-text">Player:</strong> Level ${overallLevel}`;
-                if (overallLevel >= 100) overallLine.appendChild(createImg({ src: "pictures/gg.svg", alt: "GG!", width: 24, height: 24, className: "pulse-img" }));
+                if (overallLevel >= 100) overallLine.appendChild(createImg({ src: "../pictures/gg.svg", alt: "GG!", width: 24, height: 24, className: "pulse-img" }));
                 skillsList.appendChild(overallLine);
 
                 const levelIcon = document.createElement("span");
@@ -281,7 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const line = document.createElement("p");
                     line.classList.add("skill-line");
-                    line.appendChild(createImg({ src: `pictures/skills/${skill.toLowerCase()}.png`, alt: skill, width: 20, height: 20 }));
+                    line.appendChild(createImg({ src: `../pictures/skills/${skill.toLowerCase()}.png`, alt: skill, width: 20, height: 20 }));
                     const skillName = skill.charAt(0).toUpperCase() + skill.slice(1).toLowerCase();
                     line.innerHTML += level >= 100
                         ? `<strong class="mountGrid-text">${skillName}:</strong> Level <span class="pulse">${level}</span>`
@@ -324,4 +324,5 @@ document.querySelectorAll('.toggle').forEach(btn => {
     submenu.classList.toggle('show');
     btn.querySelector('.arrow').classList.toggle('rotate');
   });
+
 });
