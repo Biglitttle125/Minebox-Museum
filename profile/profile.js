@@ -188,6 +188,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         ["speed", "jump_height", "flyable"].forEach(stat => {
             const p = document.createElement("p");
+            p.style.margin = "2px 0";  // add this line
+            p.style.lineHeight = "1.2"; // optional, to reduce height
             const label = stat === "jump_height" ? "Jump height" : stat.charAt(0).toUpperCase() + stat.slice(1);
             const value = stat === "flyable" ? (mountData.mount?.flyable ? "Yes" : "No") : mountData.mount?.[stat] ?? "-";
             p.innerHTML = `<strong class="mountGrid-text">${label}:</strong> ${value}`;
@@ -326,3 +328,4 @@ document.querySelectorAll('.toggle').forEach(btn => {
   });
 
 });
+
