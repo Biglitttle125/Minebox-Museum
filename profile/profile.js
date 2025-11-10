@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
         paperplane: "Paperplane", rocket: "Boomstick 9000", shark: "Sharktron MK-II",
         shopping_cart: "Shopping Cart of Chaos", flying_carpet: "Flying Carpet", wooden_plane: "Splinterwing",
         hipster_bike: "Hipster bike", lny_snake: "Lunar Crimson Snake", valentine_pegase: "Love-struck Pegasus",
-        puddle: "Sloshrat", ufo: "Blorbo", truck: "Truckzilla", broomstick: "Sweep"
+        puddle: "Sloshrat", ufo: "Blorbo", truck: "Truckzilla", broomstick: "Sweep", witch_broom: "TurboBroom"
     };
 
     // --- Mount Card ---
@@ -328,4 +328,5 @@ document.querySelectorAll('.toggle').forEach(btn => {
   });
 
 });
+
 
