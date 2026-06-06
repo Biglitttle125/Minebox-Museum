@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minebox Vote Tracker</title>
+
+    <style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0b1220;
+        color: white;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    #summary {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #94a3b8;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 12px;
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    .card {
+        padding: 15px;
+        border-radius: 12px;
+        background: #1f2937;
+        border: 2px solid transparent;
+    }
+
+    .ready {
+        border-color: #22c55e;
+        background: #0f2a1b;
+    }
+
+    .waiting {
+        border-color: #ef4444;
+    }
+
+    .title {
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .time {
+        color: #94a3b8;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .status {
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    a {
+        display: inline-block;
+        padding: 8px 12px;
+        background: #3b82f6;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+    button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    background: #22c55e;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+</style>
+</head>
+<body>
+
+<h1>Minebox Vote Tracker</h1>
+
+<div style="text-align:center; margin-bottom:20px;">
+    <input
+        id="usernameInput"
+        placeholder="Enter username"
+        value="jeppe0701"
+        style="
+            padding:10px;
+            border-radius:6px;
+            border:none;
+            width:220px;
+        "
+    >
+
+    <button id="loadUserBtn">
+        Load User
+    </button>
+</div>
+
+<div id="summary">Loading...</div>
+
+<div id="votes" class="grid">Loading...</div>
+
+<div id="hint" style="text-align:center; color:#94a3b8; font-size:13px; margin-top:5px;">
+    Tip: Only ready sites will open.
+</div>
+</body>
+
+    <script>
+    
+let currentUser = "jeppe0701";
+
+if ("Notification" in window && Notification.permission !== "granted") {
+    Notification.requestPermission();
+}
+const SITES = {
+  "Best Minecraft Servers": {
+    name: "Best Minecraft Servers",
+    url: "https://best-minecraft-servers.co/server-minebox.26336/vote"
+  },
+  "Minecraft-MP.com": {
+    name: "Minecraft MP",
+    url: "https://minecraft-mp.com/server/358777/vote"
+  },
+  "MinecraftServers.org": {
+    name: "MinecraftServers.org",
+    url: "https://minecraftservers.org/vote/668761"
+  },
+  "ServeurPrive": {
+    name: "Serveur-Privé",
+    url: "https://serveur-prive.net/minecraft/minebox/vote"
+  },
+  "Serveurs Minecraft": {
+    name: "Serveurs Minecraft",
+    url: "https://www.serveursminecraft.org/serveur/6292/"
+  }
+};
+
+let voteData = {};
+let readySites = [];
+let previousState = {};
+
+function notify(siteName, url) {
+
+    if (Notification.permission !== "granted") return;
+
+    const notification = new Notification("🟢 Vote Ready!", {
+        body: `${siteName} is ready to vote`,
+        icon: "https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/favicon.ico"
+    });
+
+    // 🔥 click opens site
+    notification.onclick = () => {
+        window.open(url, "_blank");
+    };
+}
+
+function render() {
+    const container = document.getElementById("votes");
+
+    const now = Date.now();
+
+    const entries = Object.keys(SITES).map(siteKey => {
+
+        const dateString = voteData[siteKey];
+
+        const voteTime = dateString ? new Date(dateString).getTime() : null;
+
+        // 🔥 KEY FIX: if missing from API → READY
+        const ready = !voteTime;
+
+        let diff = null;
+
+        if (!ready) {
+            diff = voteTime - now;
+        }
+
+        return {
+            site: siteKey,
+            voteTime,
+            diff,
+            ready
+        };
+    });
+
+    entries.sort((a, b) => b.ready - a.ready);
+
+    let readyCount = 0;
+    readySites = [];
+
+    container.innerHTML = "";
+
+    for (const item of entries) {
+
+        const siteInfo = SITES[item.site];
+const wasReady = previousState[item.site];
+const isReady = item.ready;
+
+// 🔥 trigger ONLY when it changes from false → true
+if (!wasReady && isReady) {
+    notify(siteInfo.name, siteInfo.url);
+}
+
+previousState[item.site] = isReady;
+        if (item.ready) {
+            readyCount++;
+            if (siteInfo?.url) {
+                readySites.push(siteInfo.url);
+            }
+        }
+
+        let statusText;
+
+        if (item.ready) {
+            statusText = "🟢 READY TO VOTE";
+        } else {
+            const hours = Math.floor(item.diff / 3600000);
+            const minutes = Math.floor((item.diff % 3600000) / 60000);
+            const seconds = Math.floor((item.diff % 60000) / 1000);
+
+            statusText = `⏳ ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        container.innerHTML += `
+            <div class="card ${item.ready ? "ready" : "waiting"}">
+
+                <div class="title">
+                    ${siteInfo.name}
+                </div>
+
+                <div class="time">
+                    ${item.ready ? "Ready now" : new Date(item.voteTime).toLocaleString()}
+                </div>
+
+                <div class="status">
+                    ${statusText}
+                </div>
+
+                <a href="${siteInfo.url}" target="_blank">
+                    Vote Now
+                </a>
+
+            </div>
+        `;
+    }
+
+    document.getElementById("summary").innerText =
+        `Ready: ${readyCount} / ${entries.length}`;
+}
+
+async function loadVotes() {
+  try {
+const res = await fetch(
+    `https://api.minebox.co/votes/${currentUser}`
+);
+voteData = await res.json();
+    render();
+  } catch (err) {
+    document.getElementById("votes").innerHTML =
+      "Failed to load API data.";
+    console.error(err);
+  }
+}
+
+// initial load
+loadVotes();
+
+// live updates
+setInterval(render, 1000);
+setInterval(loadVotes, 60000);
+document
+    .getElementById("loadUserBtn")
+    .addEventListener("click", () => {
+
+        const username =
+            document
+                .getElementById("usernameInput")
+                .value
+                .trim();
+
+        if (!username) {
+            alert("Enter a username.");
+            return;
+        }
+
+        currentUser = username;
+
+        loadVotes();
+    });
+</script>
+</html>
